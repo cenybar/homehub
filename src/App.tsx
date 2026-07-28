@@ -32,7 +32,7 @@ function App() {
 
   return (
     <main style={{ maxWidth: 500, margin: '40px auto', padding: 20 }}>
-      <h1>🛒 HomeHub</h1>
+      <h1>🛒 Lista de Compras</h1>
 
       <div style={{ display: 'flex', gap: 8 }}>
         <input
