@@ -1,43 +1,57 @@
-import { useState } from 'react'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { addShoppingItem, getShoppingItems } from './services/shopping'
+
+type ShoppingItem = {
+  id: string
+  text: string
+  created_at: string
+}
 
 function App() {
-  const [item, setItem] = useState('')
-  const [items, setItems] = useState<string[]>([])
+  const [items, setItems] = useState<ShoppingItem[]>([])
+  const [newItem, setNewItem] = useState('')
 
-  function addItem() {
-    if (item.trim() === '') return
+  async function loadItems() {
+    const data = await getShoppingItems()
+    setItems(data ?? [])
+  }
 
-    setItems([...items, item])
-    setItem('')
+  useEffect(() => {
+    loadItems()
+  }, [])
+
+  async function handleAdd() {
+    if (!newItem.trim()) return
+
+    await addShoppingItem(newItem)
+
+    setNewItem('')
+
+    await loadItems()
   }
 
   return (
-    <main>
+    <main style={{ maxWidth: 500, margin: '40px auto', padding: 20 }}>
       <h1>🛒 HomeHub</h1>
 
-      <input
-        type="text"
-        placeholder="Añadir un producto..."
-        value={item}
-        onChange={(e) => setItem(e.target.value)}
-      />
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          placeholder="Añadir producto"
+          style={{ flex: 1 }}
+        />
 
-      <button onClick={addItem}>
-        Añadir
-      </button>
+        <button onClick={handleAdd}>
+          Añadir
+        </button>
+      </div>
 
-      <hr />
-
-      {items.length === 0 ? (
-        <p>No hay productos.</p>
-      ) : (
-        <ul>
-          {items.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      )}
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>{item.text}</li>
+        ))}
+      </ul>
     </main>
   )
 }
